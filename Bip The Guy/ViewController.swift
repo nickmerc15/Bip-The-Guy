@@ -9,15 +9,23 @@
 import UIKit
 import AVFoundation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate
+{
 
     @IBOutlet weak var imageToPunch: UIImageView!
     
     var audioPlayer = AVAudioPlayer ()
     
+    var imagePicker = UIImagePickerController ()
+    
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+
         // Do any additional setup after loading the view.
+        imagePicker.delegate = self
+        
     }
     
     func animateImage() {
@@ -42,20 +50,41 @@ class ViewController: UIViewController {
         }
     }
     
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+           let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+           
+           imageToPunch.image = selectedImage
+           
+           dismiss(animated: true, completion: nil)
+       }
     
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+           // All we need to do is call the dismiss method.
+           dismiss(animated: true, completion: nil)
+       }
     
-        @IBAction func libraryPressed(_ sender: UIButton) {
-    }
+   @IBAction func libraryPressed(_ sender: UIButton) {
+               imagePicker.sourceType = .photoLibrary
+ 
     
-    
-       @IBAction func cameraPressed(_ sender: UIButton) {
-    }
-    
-    
-       @IBAction func imageTapped(_ sender: UITapGestureRecognizer) {
-        animateImage()
-        playSound(soundName: "punchSound", audioPlayer: &audioPlayer)
-    }
+        present(imagePicker, animated: true, completion: nil)
+           }
+           
+           @IBAction func cameraPressed(_ sender: UIButton) {
+               
+               // Check to see if the camera is available.  If we didn't have this & clicked the "Camera" button in the simulator, our app would crash.
+               if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                   imagePicker.sourceType = .camera
+                   present(imagePicker, animated: true, completion: nil)
+              
+           }
     
 
+    }
+    
+    @IBAction func imageTapped(_ sender: UITapGestureRecognizer) {
+           animateImage()
+           playSound(soundName: "punchSound", audioPlayer: &audioPlayer)
+       }
 }
+
